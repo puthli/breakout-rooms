@@ -1,5 +1,5 @@
 # breakout-rooms
-Breakout-rooms add-on to to the Jitsi Meet and Jitsi Videobridge projects.
+Breakout-rooms add-on to to the Jitsi Meet and Jitsi Videobridge projects. Also includes a prometheus endpoint for the videoserver that you can poll to get statistics.
 
 ## prerequisites
 - Docker
@@ -7,6 +7,16 @@ Breakout-rooms add-on to to the Jitsi Meet and Jitsi Videobridge projects.
 - Bash
 
 ## installation (work in progress)
+Copy the example.env file to .env and change the MYPUBLICURL and MYCONTACTEMAIL to your url and contact email. The letsencrypt script will attempt to create an ssh certificate for that url, so it needs to be something in your control.
+
+### bundle the files into a zip file
+```
+. ./zip.sh
+```
+Will create two zip files. Copy them to the server you want to install breakout-rooms
+
+### download and install jitsi docker 
+
 ```
 git clone https://github.com/jitsi/docker-jitsi-meet && cd docker-jitsi-meet
 
@@ -21,6 +31,8 @@ Then do
 ```
 docker-compose down
 ```
+
+### add the breakout-rooms software
 
 ```
 export CONFIG=/config
