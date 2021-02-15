@@ -14,13 +14,16 @@ mkdir /config
 mkdir -p /config/{web/letsencrypt,transcripts,prosody,jicofo,jvb}
 ```
 To create the folders we need, do 
-```docker-compose up -d
+```
+docker-compose up -d
 ```
 Then do
-```docker-compose down
+```
+docker-compose down
 ```
 
-```export CONFIG=/config
+```
+export CONFIG=/config
 mkdir /docker-websocket
 unzip /docker-websocket.zip -d /docker-websocket
 mkdir /additional-config
@@ -28,5 +31,6 @@ unzip /additional-config.zip -d /
 cp /additional-config/docker-compose.yml /docker-jitsi-meet/
 ```
 Start all the services using:
-```. /additional-config/scripts/start-all.sh
+```
+. /additional-config/scripts/start-all.sh
 ```
