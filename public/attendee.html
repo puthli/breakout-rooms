@@ -1,0 +1,472 @@
+<!--
+    Copyright 2020 Itude Mobile BV
+
+    Licensed under the Apache License, Version 2.0 (the "License");
+    you may not use this file except in compliance with the License.
+    You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS,
+    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    See the License for the specific language governing permissions and
+    limitations under the License.
+-->
+
+<html>
+
+<head>
+    <link rel="shortcut icon" href="favicon.ico">
+    <title>WURK.APP</title>
+    <meta name="description"
+        content="Secure video calls with breakout rooms.
+         To participate, open the link in google chrome, edge, firefox, iOS or Android. iOS or Android users will be prompted to download an app first." />
+    <meta property="og:description"
+        content="Secure video calls. Breakout rooms and screen sharing.
+         To participate, open the link in google chrome, edge, firefox, iOS or Android. iOS or Android users will be prompted to download an app first." />
+
+    <link rel="stylesheet" href="css/bootstrap.min.css">
+</head>
+
+<body>
+    <div class="row align-items-center border-bottom container-fluid pl-4 mt-3 pb-3 pr-3">
+        <div class="col">
+            <div class="row align-items-center justify-content-left">
+
+                    <img src="favicon.ico"></img>
+                <div class="font-weight-bold ml-3">WURK.APP</div>
+                <span class="ml-3 text-black-50">Attendee screen</span>
+            </div>
+        </div>
+        <div class="col">
+            <div class="row align-items-center justify-content-center">
+                <span class="font-weight-bold" id="subject">My Meeting</span>
+                <span class="timeboxRemainder ml-2 text-black-50"></span>
+            </div>
+        </div>
+        <div class="col">
+            <div class="row align-items-center justify-content-end">
+                <span class="font-weight-bold" id="roomName"> Main Room</span>
+            </div>
+        </div>
+    </div>
+    <div class="container-fluid row pr-0 " style="height: 100%;">
+        <div id="top" class="col col-sm-10" style="height: 90%; width: 80%;">
+            <div id="activeRoom"></div>
+        </div>
+        <div class="d-flex justify-content-center align-items-center">
+            <div id="move" class="toast" style="position: absolute; top: 15%; right: 50%;" role="alert" aria-live="assertive"
+                aria-atomic="true" data-delay="3000" data-animation="true">
+                <div class="toast-header">
+                    <strong class="mr-auto">Moving to another room</strong>
+                    <button type="button" class="ml-2 mb-1 close" data-dismiss="toast" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="toast-body">
+                    The organizer <span class="moderatorName"></span> is moving you to another room.
+                </div>
+            </div>
+            <div id="timebox" class="toast" style="position: absolute; top: 15%; right: 50%;" role="alert" aria-live="assertive"
+                aria-atomic="true" data-delay="10000" data-animation="true">
+                <div class="toast-header">
+                    <strong class="mr-auto">Timebox set!</strong>
+                    <button type="button" class="ml-2 mb-1 close" data-dismiss="toast" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="toast-body">
+                    <span class="moderatorName"></span> set a meeting wide timebox.
+                    After the timebox expires you will automatically be transferred to the main room.
+                    You can leave the room earlier by hanging up.
+                    <p>You can safely dismiss this message, the remaining time is shown at the top of the window</p>
+                    <hr />
+                    Remaining time: <span class="timeboxRemainder"></span>
+                </div>
+            </div>
+        </div>
+        <div id="entryModal" class="modal" tabindex="-1" role="dialog">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <img src="favicon.ico" class="img mr-2" />
+                        <h5 class="modal-title">Please enter your name</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <form name="displayName" >
+                        <div class="modal-body">
+                            <p>This is the name that will be displayed to other attendees.</p>
+                            <input type="text" class="form-control" id="displayNameModal" placeholder="John Doe"
+                                title="Enter your name so other attendees know who you are">
+                        </div>
+                        <div class="modal-footer">
+                            <button type="submit" onclick="entryInput()" class="btn btn-secondary"
+                                data-dismiss="modal">Start!</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+        <div id="incompatibleBrowser" class="modal" tabindex="-1" role="dialog">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        
+                        <img src="favicon.ico" class="img mr-2" />
+                        <h5 class="modal-title">Incompatible browser detected</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                        
+                    </div>
+                    <div class="modal-body">
+                        <p>We want to give you the best video experience, but your browser does not fully support the open standards we need for that.</p>
+                        <p>Please use the latest Chrome browser: <a href="https://www.google.com/chrome/">https://www.google.com/chrome/</a> </p>
+                        <p><sub>(Edge and Firefox will also work)</sub></p>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="submit"  class="btn btn-secondary" onclick='$("#displayNameSection").toast("show");'
+                            data-dismiss="modal">Try with this browser anyway</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col col-sm-2 mr-0 pr-0 pl-0 ml-0">
+            <div class="container-fluid mr-0 pr-0 ml-0 pl-0">
+                <div class="container mt-3">
+                    <label for="displayName" class="pl-0 ml-0">Your name</label>
+                    <form onsubmit="shareName(null); return false;" class="row">
+                        <input type="text" class="form-control mr-0 col" id="displayName" placeholder="John Doe"
+                            title="Enter your name so others in the group know who you are"></input>
+
+                        <input class="btn-secondary btn-sm ml-0 col-3" type="submit" value="Save"
+                            title="Share your name with the group">
+                        </input>
+                    </form>
+                </div>
+                <div id="controls" class="container row">
+                    <div>
+                        <div id="toggleAudio" style="width:70px;" onclick="toggleAudio();"
+                            class="btn btn-outline-primary mr-2"></div>
+                    </div>
+                    <div>
+                        <div id="toggleVideo" style="width:70px;" onclick="toggleVideo();"
+                            class="btn btn-outline-primary"></div>
+                    </div>
+                </div>
+                <div id="messages" class="container col-12 ml-0 pl-0 mr-0 pr-0 mt-3 pb-0" style="overflow-y: scroll;height:650px;"></div>
+
+            </div>
+        </div>
+
+    </div>
+
+    <hr />
+
+    <template>
+        <div id="receivedMessage" class="container-fluid rounded border mt-1 ml-0 mr-0  bg-light">
+            <strong><span class="moderatorName"></span></strong><span class="float-right text-black-50"><i class="fas fa-clock"></i> <span id="time"></span></span>
+            <div class="container-fluid pl-0">
+                <span id="receivedMessageBody"></span>
+            </div>
+        </div>
+    </template>
+
+    <div id="log"></div>
+</body>
+
+</html>
+
+<script src="js/jquery-3.4.1.slim.min.js"></script>
+<script src="js/popper.min.js"></script>
+<script src="js/bootstrap.min.js"></script>
+<script src="js/wurk-1.0.js"></script>
+<script src="js/icons.js"></script>
+
+
+<script>
+    const DEBUG = false;
+
+    let rooms = {};
+    let api = {};
+    let timeboxEnd = new Date();
+    let timeboxChecker;
+    let moderatorPrefix = (new URLSearchParams(window.location.search)).get('id');
+    let presetModeratorPrefix = (new URLSearchParams(window.location.search)).get('id');
+    if (presetModeratorPrefix && presetModeratorPrefix.length > 10) {
+        moderatorPrefix = presetModeratorPrefix;
+    }
+    if (DEBUG) {
+        moderatorPrefix = "debugThisSession"
+    }
+    let mainRoom = "Main-Room";
+    let participantId = window.sessionStorage.getItem(moderatorPrefix + "-participantId");
+    if (!participantId) {
+        participantId = uuidv4();
+        window.sessionStorage.setItem(moderatorPrefix + "-participantId", participantId);
+    }
+    let callParticipantId;
+    let displayName = window.sessionStorage.getItem(moderatorPrefix + "-displayName");
+    $('#displayName').val(displayName);
+    let currentRoom;
+    let videoMuted = false;
+    let audioMuted = true;
+    let tileView = false;
+
+
+    if (displayName == "" || displayName == null) {
+        $('#entryModal').modal('show');
+    }
+
+    function entryInput() {
+        displayName = $('#displayNameModal').val();
+        shareName(displayName);
+    }
+
+    function shareName(name) {
+        displayName = name ? name: $('#displayName').val();
+        $('#displayName').val(displayName);
+        window.sessionStorage.setItem(moderatorPrefix + "-displayName", displayName);
+
+        if (api) {
+            api.executeCommand("displayName", displayName);
+        }
+    }
+    function addControls() {
+        let toggleAudio = document.querySelector('#toggleAudio');
+        if (audioMuted == true) toggleAudio.innerHTML = '<i class="fas fa-microphone-slash fa-2x"></i>'
+        else toggleAudio.innerHTML = '<i class="fas fa-microphone fa-2x"></i>';
+        let toggleVideo = document.querySelector('#toggleVideo');
+        if (videoMuted == true) toggleVideo.innerHTML = '<i class="fas fa-video-slash fa-2x"></i>'
+        else toggleVideo.innerHTML = '<i class="fas fa-video fa-2x"></i>';
+
+    }
+    addControls();
+
+    function padZero(number){
+        if (number < 10) {
+            number = "0" + number;
+        }
+        return number;
+    }
+
+    function showBroadcastMessage(body) {
+        let templates = document.getElementsByTagName("template")[0];
+        let messageTemplate = templates.content.querySelector("#receivedMessage");
+        let clone = document.importNode(messageTemplate,true);
+        let time = clone.querySelector("#time");
+        let today = new Date();
+        time.innerHTML = padZero(today.getHours()) + ":" + padZero(today.getMinutes());
+        let messageBody = clone.querySelector("#receivedMessageBody");
+        messageBody.innerHTML = body;
+        let messages = document.querySelector("#messages");
+        messages.appendChild(clone);
+        setTimeout(function () {
+            clone.scrollIntoView({ block: "start", behavior: "smooth"});
+            clone.parentNode.scrollTop = clone.offsetTop;
+        }, 50);
+    }
+
+    // Websocket code
+
+    function onOpen(evt) {
+        heartbeat();
+        writeToScreen("CONNECTED");
+        doSend(`SUB:"${moderatorPrefix}"`);
+        doSend(`PUB:"${moderatorPrefix}": {"cmd":"ping"}`);
+        joinRoom(mainRoom, true, true);
+    }
+
+    function onMessage(evt) {
+        writeToScreen('<span style="color: blue;">RESPONSE: ' + evt.data + '</span>');
+        let message = evt.data;
+        let messageString = '{' + message.substring(4) + '}';
+        let event = JSON.parse(messageString);
+        let command = event[moderatorPrefix];
+        if (command.cmd == 'joinRoom') {
+            if (command.properties.id == participantId) {
+                $('#move').toast('show');
+                $('.moderatorName').text = command.properties.displayName
+                setTimeout(function () {
+                    endRoom(); joinRoom(command.properties.room, true, true);
+                }, 3000)
+            }
+        }
+        if (command.cmd == 'ping') {
+            doSend(`PUB:"${moderatorPrefix}": {"cmd":"pong", "properties": \
+                {"room":"${currentRoom}", "id":"${participantId}", "displayName":"${displayName}" \
+                , "tileView": ${tileView}, "videoMuted":${videoMuted}, "audioMuted":${audioMuted}
+                }}`);
+        }
+        if (command.cmd == 'endRoom') {
+            if (command.properties.room == currentRoom) {
+                endRoom();
+                joinRoom(mainRoom, true, true);
+            }
+        }
+        if (command.cmd == 'endMeeting') {
+            endRoom();
+            window.location.replace('https://www.wurk.app/thanks-beta/');
+        }
+        if (command.cmd == 'subject') {
+            $('#subject').text(command.properties.subject);
+        }
+        if (command.cmd == 'moderatorPong') {
+            $('#subject').text(command.properties.subject);
+            showBroadcastMessage("Welcome! The organiser is already in the meeting");
+            $('.moderatorName').text(command.properties.displayName);
+        }
+        if (command.cmd == 'broadcast') {
+            showBroadcastMessage(command.properties.message);
+            $('.moderatorName').text(command.properties.displayName);
+        }
+        if (command.cmd == 'timebox') {
+            let minutes = command.properties.timebox
+            timeboxEnd = (new Date()).getTime() + minutes * 60000;
+            $('.moderatorName').text(command.properties.displayName)
+            $('#timeboxDuration').text(minutes)
+            $('.timeboxRemainder').text(command.properties.timebox)
+            $('#timebox').toast('show');
+            timeboxChecker = setInterval(function () { checkTimebox(); }, 1000);
+        }
+        if (command.cmd == 'toggleAudio') {
+            if (command.properties.id == participantId) {
+                api.executeCommand('toggleAudio');
+            }
+        }
+        if (command.cmd == 'toggleVideo') {
+            if (command.properties.id == participantId) {
+                api.executeCommand('toggleVideo');
+            }
+        }
+        if (command.cmd == 'toggleTileView') {
+            if (command.properties.id == participantId) {
+                api.executeCommand('toggleTileView');
+            }
+        }
+
+    }
+
+    function checkTimebox() {
+        let remainder = getRemainingTime();
+        $('.timeboxRemainder').text(remainder);
+        if (timeboxEnd - new Date() <= 0) {
+            if (currentRoom != mainRoom) {
+                setTimeout(function () {
+                    endRoom(); joinRoom(mainRoom, true, true);
+                }, 3000);
+            }
+            clearInterval(timeboxChecker);
+            $('.timeboxRemainder').text('');
+            $('.timeboxRemainder').addClass("text-black-50");
+            $('.timeboxRemainder').removeClass("text-danger");
+            $('.timeboxRemainder').removeClass("font-weight-bold");
+            $('#timebox').toast('hide');
+        }
+        // let user know the last 10 seconds of the timebox
+        if (timeboxEnd - new Date() <= 10 * 1000) {
+            $('.timeboxRemainder').removeClass("text-black-50");
+            $('.timeboxRemainder').addClass("text-danger");
+            $('.timeboxRemainder').addClass("font-weight-bold");
+        }
+
+    }
+
+    function endRoom() {
+        api.executeCommand('hangup');
+        api.dispose();
+        doSend(`PUB:"${moderatorPrefix}": {"cmd":"leftRoom", "properties": \
+            {"room":"${currentRoom}", "id":"${participantId}"}}`);
+    }
+
+    function toggleAudio() {
+        api.executeCommand('toggleAudio');
+    }
+    function toggleVideo() {
+        api.executeCommand('toggleVideo');
+    }
+
+    function joinRoom(roomName, audio, video) {
+
+        let top = document.querySelector('#top');
+        const options = {
+            roomName: moderatorPrefix + '-' + roomName,
+            parentNode: document.querySelector('#activeRoom'),
+            configOverwrite: {
+                enableNoisyMicDetection: false,
+                channelLastN: 25
+            },
+            interfaceConfigOverwrite: {
+                TOOLBAR_ALWAYS_VISIBLE: true,
+                DEFAULT_REMOTE_DISPLAY_NAME: 'Unknown participant',
+                SHOW_JITSI_WATERMARK: false,
+                TOOLBAR_BUTTONS: [
+                    'microphone', 'camera', 'desktop',
+                    'fodeviceselection', 'hangup', 'profile', 'chat', 'sharedvideo', 'raisehand',
+                    'videoquality', 'filmstrip', 'tileview', 'help', 'settings'
+                ]
+            }
+        };
+        api = new JitsiMeetExternalAPI(jitsiDomain, options);
+        api.executeCommand('subject', roomName);
+        if (audio == false) { api.executeCommand('toggleAudio'); }
+        if (video == false) { api.executeCommand('toggleVideo'); }
+        api.on("videoConferenceLeft", (event) => {
+            doSend(`PUB:"${moderatorPrefix}": {"cmd":"leftRoom", "properties": \
+            {"room":"${roomName}", "id":"${participantId}"}}`);
+            //joinRoom(mainRoom, 800, 500, false, false); // return to default room
+            location.reload();
+        });
+        api.on("videoConferenceJoined", (event) => {
+            displayName = event.displayName;
+            callParticipantId = event.id
+            doSend(`PUB:"${moderatorPrefix}": {"cmd":"joinedRoom", "properties": \
+            {"room":"${roomName}", "id":"${participantId}", "displayName":"${event.displayName}", \
+            "tileView": ${tileView}, "videoMuted":${videoMuted}, "audioMuted":${audioMuted}}}`);
+            $('#roomName').text(roomName);
+        });
+        api.on("displayNameChange", (event) => {
+            if (event.id === callParticipantId){
+                displayName = event.displayname;
+                doSend(`PUB:"${moderatorPrefix}": {"cmd":"displayNameChanged", "properties": \
+                {"room":"${roomName}", "id":"${participantId}", "displayName":"${event.displayname}"}}`);
+            }
+        });
+        api.on("videoMuteStatusChanged", (event) => {
+            videoMuted = event.muted;
+            addControls();
+            if (participantId != undefined) {
+                doSend(`PUB:"${moderatorPrefix}": {"cmd":"videoMuteStatusChanged", "properties": \
+                {"id":"${participantId}", "muted":${event.muted}}}`);
+            }
+        });
+        api.on("audioMuteStatusChanged", (event) => {
+            audioMuted = event.muted;
+            addControls();
+            if (participantId != undefined) {
+                doSend(`PUB:"${moderatorPrefix}": {"cmd":"audioMuteStatusChanged", "properties": \
+                {"id":"${participantId}", "muted":${event.muted}}}`);
+            }
+        });
+        api.on("tileViewChanged", (event) => {
+            tileView = event.enabled;
+            if (participantId != undefined) {
+                doSend(`PUB:"${moderatorPrefix}": {"cmd":"tileViewChanged", "properties": \
+                {"id":"${participantId}", "enabled":${event.enabled}}}`);
+            }
+        });
+        currentRoom = roomName;
+    }
+    window.onbeforeunload = function () {
+        endRoom();
+    }
+    //$('.toast').toast({});
+    $(".toast").toast("hide");
+    if (isCompatibleBrowser()){
+        $("#displayNameSection").toast("show");
+    }
+
+</script>

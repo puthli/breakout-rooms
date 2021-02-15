@@ -1,0 +1,17 @@
+upstream websocket {
+    server websocket:8888;
+}
+
+server {
+	listen 80 default_server;
+	return 301 https://$host$request_uri;
+}
+
+server {
+	listen 443 ssl;
+
+	include /config/nginx/ssl.conf;
+	include /config/nginx/meet.conf;
+	include /config/nginx/websocket.conf;
+}
+

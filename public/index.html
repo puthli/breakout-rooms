@@ -1,0 +1,271 @@
+<!--
+    Copyright 2020 Itude Mobile BV
+
+    Licensed under the Apache License, Version 2.0 (the "License");
+    you may not use this file except in compliance with the License.
+    You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS,
+    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    See the License for the specific language governing permissions and
+    limitations under the License.
+-->
+
+
+<html>
+
+<head>
+    <link rel="shortcut icon" href="favicon.ico">
+    <title>WURK.APP</title>
+    <meta name="description"
+        content="Secure video calls. Breakout rooms and screen sharing. 
+         To participate, open the link in google chrome, edge, firefox, iOS or Android. iOS or Android users will be prompted to download an app first." />
+    <meta property="og:description"
+        content="Secure video calls. Breakout rooms and screen sharing. 
+         To participate, open the link in google chrome, edge, firefox, iOS or Android. iOS or Android users will be prompted to download an app first." />
+    <link rel="stylesheet" href="css/bootstrap.min.css">
+</head>
+
+<body>
+    <div class="container-fluid pl-0 pr-0" style="width:100%">
+        <div class="row row-cols-md-1 pl-0">
+            <div class="card">
+                <div class="card-header ml-2" >
+                    <div class="row">
+                        <div class="col-6" data-toggle="modal"
+                            data-target="#welcomeModal" role=""><h6 class="mr-2">WURK.APP Meeting</h6>Invitation link:
+                            <span id="shareLink"></span>
+                        </div>
+                        <div id="controls" class="col row">
+                            <div>
+                            <form onsubmit="shareName(); return false;" class="row mt-2 mb-2">
+                                <label for="displayName" class="mt-2 mr-0 pr-0 ml-5 col">Your name</label>
+                                <input type="text" class="form-control mr-0 ml-0 col" id="displayName" placeholder="John Doe"
+                                    title="Enter your name so others in the group know who you are"></input>
+                                <div class="col"><input class="btn btn-secondary  " type="submit" value="Save"
+                                    title="Share your name with the group">
+                                </input>
+                                </div>
+                                </div>
+                            </form>
+                        </div>
+                        <div id="controls" class="col row mt-1 ml-2">
+                            <div>
+                                <div type="button" style="width:70px;" class="btn btn-outline-primary float-right ml-1" data-toggle="modal"
+                                    data-target="#welcomeModal" title="Help"><i class="fas fa-info fa-2x "></i></div>
+                                <div id="toggleVideo" style="width:70px;" onclick="toggleVideo();" class="btn btn-outline-primary float-right ml-1"></div>
+                                <div id="toggleAudio" style="width:70px;" onclick="toggleAudio();" class="btn btn-outline-primary float-right"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="container-fluid row pr-0" style="height: 85%; width:100%">
+        <div id="top" class="container-fluid">
+        </div>
+    </div>
+    <div id="welcomeModal" class="modal" tabindex="-1" role="dialog">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <img src="favicon.ico" class="img mr-2" />
+                    <h5 class="modal-title">How to use WURK.APP</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <p>To invite others to join, send them the invite text below.</p>
+                        <hr />
+                        <div><div id="shareInvite"><p><span id="inviter"></span> You are invited to join a WURK.APP meeting<span id="inviteSubject"></span></p>
+                                <p>   Open this link in Google Chrome, Edge or Firefox to join: <span id="inviteLink"></span>
+                                </p>
+                                <p>iOS and Android users can open the link too. They will be prompted to download a mobile app.</p>
+
+                                <p><small>WURK.APP is a privacy friendly video conference service (www.wurk.app).</small></p>
+                                <p></p>
+                            </div>
+                        </div>
+                        <a id="emailInvite" href="#!" target="_blank" class="btn btn-primary">Email invite text</a>
+                        <a href="#" onclick="copyInvite();" class="btn btn-primary">Copy to clipboard</a>
+                    <hr />
+                    <p><small><a href="https://www.wurk.app" target="_blank">About this service</a></small></p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Got it!</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div id="incompatibleBrowser" class="modal" tabindex="-1" role="dialog">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+    
+                    <img src="favicon.ico" class="img mr-2" />
+                    <h5 class="modal-title">Incompatible browser detected</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+    
+                </div>
+                <div class="modal-body">
+                    <p>We want to give you the best video experience, but your browser does not fully support the open standards
+                        we need for that.</p>
+                    <p>Please use the latest Chrome browser: <a
+                            href="https://www.google.com/chrome/">https://www.google.com/chrome/</a> </p>
+                    <p><sub>(Edge and Firefox will also work)</sub></p>
+                </div>
+                <div class="modal-footer">
+                    <button onclick="showHelp();" class="btn btn-secondary" data-dismiss="modal">Ok</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+
+</html>
+
+<script src="js/jquery-3.4.1.slim.min.js"></script>
+<script src="js/popper.min.js"></script>
+<script src="js/bootstrap.min.js"></script>
+<script src="js/wurk-1.0.js"></script>
+<script src="js/icons.js"></script>
+
+<script>
+    const DEBUG = false;
+    let api;
+    let displayName; 
+    let subject; 
+    let videoMuted = false;
+    let audioMuted = true;
+    let tileView = false;
+
+    let moderatorPrefix = (Math.random().toString(36).substring(2, 16) + Math.random().toString(36).substring(2, 16)).toLowerCase() + '-';
+    let presetModeratorPrefix = (new URLSearchParams(window.location.search)).get('id');
+    if (presetModeratorPrefix && presetModeratorPrefix.length > 10) {
+        moderatorPrefix = presetModeratorPrefix;
+    }
+    else {
+        window.location.replace('index.html?id=' + moderatorPrefix);
+    }
+    if (DEBUG) {
+        moderatorPrefix = "debugThisSession"
+    }
+
+    let inviteLink = 'https://' + window.location.hostname + '/ws/index.html?id=' + moderatorPrefix;
+    let header = document.querySelector('#shareLink');
+    header.appendChild(document.createTextNode(inviteLink));
+    let mainRoom = "Main";
+    let currentRoom;
+
+    if (isCompatibleBrowser() == true){
+        showHelp();
+    }
+
+    function onOpen() {
+        joinRoom(mainRoom, true, true);
+    }
+
+    function copyInvite() {
+        let range = document.createRange();
+        range.selectNode(document.getElementById('shareInvite')); 
+        window.getSelection().removeAllRanges();
+        window.getSelection().addRange(range); 
+        document.execCommand('copy');
+    }
+
+    function showHelp(){
+        $("#inviteLink").text(inviteLink);
+        let emailInvite = $("#emailInvite");
+        let bodyLines = $("#shareInvite").text().split("\n");
+        let body = bodyLines.join("%0D%0A");
+        console.log(body);
+        emailInvite.attr("href", "mailto:?subject=Invitation for a WURK.APP videocall&body=" + body);
+        $('#welcomeModal').modal('show');
+    }
+
+    function addControls() {
+        let toggleAudio = document.querySelector('#toggleAudio');
+        if (audioMuted == true) toggleAudio.innerHTML = '<i class="fas fa-microphone-slash fa-2x"></i>'
+        else toggleAudio.innerHTML = '<i class="fas fa-microphone fa-2x"></i>';
+        let toggleVideo = document.querySelector('#toggleVideo');
+        if (videoMuted == true) toggleVideo.innerHTML = '<i class="fas fa-video-slash fa-2x"></i>'
+        else toggleVideo.innerHTML = '<i class="fas fa-video fa-2x"></i>';
+    }
+    addControls();
+
+    function shareName() {
+        displayName = $('#displayName').val();
+        if (api) {
+            api.executeCommand("displayName", displayName);
+        }
+    }
+
+    function toggleAudio() {
+        api.executeCommand('toggleAudio');
+    }
+    function toggleVideo() {
+        api.executeCommand('toggleVideo');
+    }
+
+    function joinRoom(roomName, audio, video) {
+        console.log('Creating room: ' + roomName);
+        let top = document.querySelector('#top');
+
+        while (top.firstChild) {
+            top.firstChild.remove();
+        }
+        const options = {
+            roomName: moderatorPrefix + '-' + roomName,
+            parentNode: top,
+            configOverwrite: {
+                channelLastN: 25
+            },
+            interfaceConfigOverwrite: {
+                DEFAULT_REMOTE_DISPLAY_NAME: 'Unknown participant',
+                SHOW_JITSI_WATERMARK: false,
+                TOOLBAR_BUTTONS: [
+                    'microphone', 'camera', 'desktop', 'fullscreen',
+                    'fodeviceselection', 'hangup', 'profile',  'chat',
+                    'sharedvideo', 'settings', 'raisehand',
+                    'videoquality', 'filmstrip', 'feedback', 'stats', 'shortcuts',
+                    'tileview', 'videobackgroundblur', 'download', 'help', 'mute-everyone'
+                ]
+            }
+        };
+        api = new JitsiMeetExternalAPI(jitsiDomain, options);
+        api.executeCommand('subject', roomName);
+        api.executeCommand("displayName", displayName);
+        api.on("videoConferenceLeft", (event) => {
+            window.location.replace('https://www.wurk.app/thanks-beta/')
+        });
+        api.on("videoConferenceJoined", (event) => {
+            displayName = event.displayName;
+        });
+        api.on("videoMuteStatusChanged", (event) => {
+            videoMuted = event.muted;
+            addControls();
+        });
+        api.on("audioMuteStatusChanged", (event) => {
+            audioMuted = event.muted;
+            addControls();
+        });
+        api.on("displayNameChange", (event) => {
+            displayName = event.displayname;
+            $('#displayName').val(displayName);
+        });
+        if (audio == false) { api.executeCommand('toggleAudio'); }
+        if (video == false) { api.executeCommand('toggleVideo'); }
+        currentRoom = roomName;
+    }
+
+    window.onbeforeunload = function () {
+        if (api) api.dispose();
+    }
+
+</script>

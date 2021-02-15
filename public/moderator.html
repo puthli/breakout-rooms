@@ -1,0 +1,921 @@
+<!--
+    Copyright 2020 Itude Mobile BV
+
+    Licensed under the Apache License, Version 2.0 (the "License");
+    you may not use this file except in compliance with the License.
+    You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS,
+    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    See the License for the specific language governing permissions and
+    limitations under the License.
+-->
+
+<html>
+    <head>
+    <link rel="shortcut icon" href="favicon.ico">
+        <title>WURK.APP</title>
+    <meta name="description"
+        content="Secure video calls. Breakout rooms and screen sharing.
+         To participate, open the link in google chrome, edge, firefox, iOS or Android. iOS or Android users will be prompted to download an app first." />
+    <meta property="og:description"
+        content="Secure video calls. Breakout rooms and screen sharing.
+         To participate, open the link in google chrome, edge, firefox, iOS or Android. iOS or Android users will be prompted to download an app first." />
+        <link rel="stylesheet" href="css/bootstrap.min.css">
+        <link rel="stylesheet" href="css/additional.css">
+    </head>
+
+<body>
+
+    <div class="container-fluid ml-3 mt-3 mr-3">
+        <div class="row align-items-center border-bottom pb-3">
+            <div class="col-3">
+                <div class="row align-items-center justify-content-left">
+                    <div class="">
+                        <img src="favicon.ico"></img>
+                    </div>
+                    <div class="font-weight-bold ml-3">WURK.APP</div>
+                    <span class="ml-3 text-black-50">Moderator screen</span>
+                </div>
+            </div>
+            <div class="col">
+                <div class="row align-items-center justify-content-center ">
+                    <span style="position:absolute;left:-999em;"><span id="invisibleShareLink"></span></span>
+                    <!-- je mag alleen daadwerkelijk 'aanwezige' dingen kopieren dan maar zo-->
+                    <a href="#!" onclick="copyInvite(0)">Invite link <i class="far fa-copy"></i></a>
+
+                </div>
+            </div>
+            <div class="col">
+                <div class="row align-items-center justify-content-center ">
+                    <span class="font-weight-bold align-items-center" onclick="entryModal()" style="cursor:pointer">
+                        <span id="subject"> Main Room</span>
+                        <i class="far fa-edit"></i>
+                    </span>
+                    <span class="ml-3 text-black-50 align-items-center" id="duration"></span>
+                </div>
+            </div>
+            <div class="col">
+                <div class="row align-items-center justify-content-center ">
+                    <a href="#!" onclick="$('#welcomeModal').modal('show');">Help <i class="fas fa-info-circle"></i></a>
+                </div>
+            </div>
+            <div class="col">
+                <div class="row align-items-center">
+                    <button class="btn-danger btn mr-4 float-right" style="margin-left: auto;" onclick="endMeeting();"
+                        title="sends all participants to the post-meeting screen">
+                        End meeting</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="row pl-0">
+            <div class="container-fluid col-9 jumbotron align-middle justify-content-center" >
+                <div id="noRoomJoined" class="text-center" >
+                    <p>You are not in a room right now. </p>
+                    <p>Select a room and press 'join' to join in the conversation.</p>
+                    <button class="btn btn-primary btn-lg" onclick="joinMainRoom();">Join the Main Room</button>
+                </div>
+                <div id="breakoutRoom" class="container-fluid">
+                </div>
+            </div>
+            <div class="container-fluid col border-left pt-2 pl-3">
+                <div class="container-fluid row">
+                        <div class="container-fluid row">
+                            <div id="timeboxTitle" class="container-fluid row input-group-prepend mt-1 mr-1 align-items-center" style="cursor:pointer" onclick="showMeetingControls();">
+                                <div class="container-fluid col pl-0">
+                                    <div class="font-weight-bold float-left mr-2">Timebox </div>
+                                    <div id="timeboxRemainder" class="text-black-50 ml-2 mr-2"> 00:00:00 </div>
+                                </div>
+                                    <div class="font-weight-bold "><i class="far fa-edit"></i></div>
+                            </div>
+                        </div>
+                </div>
+                <div class="container-fluid row">
+                    <div class="mt-3 mb-2">
+                        <span class="float-left mr-3 font-weight-bold">Rooms</span>
+                    </div>
+                </div>
+                <div id="rooms" style="margin-left:0px; height:620px; width:100%; overflow-y:scroll; overflow-x: hidden;">
+                </div>
+                <div class="container-fluid row justify-content">
+                    <div class="btn-block">
+                        <button class="btn btn-primary btn-lg btn-block text-center" onclick="createNumberedRoom();">Add new
+                        room</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div id="welcomeModal" class="modal" tabindex="-1" role="dialog">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <img src="https://www.wurk.app/favicon.ico" class="img mr-2" />
+                    <h5 class="modal-title">How to use WURK.APP</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <h4>Inviting others</h4>
+                    <p>To invite others to join, send them the invite text below.</p>
+                    <hr />
+                    <div>
+                        <div id="shareInvite">
+                            <p><span id="inviter"></span> You are invited to join a WURK.APP meeting<span
+                                    id="inviteSubject"></span></p>
+                            <p> Open this link in Google Chrome, Edge or Firefox to join: <span id="shareLink"></span>
+                            </p>
+                            <p>iOS and Android users can open the link too but can only use the Main Room. They will be prompted to download a mobile
+                                app.
+                            </p>
+
+                            <p><small>WURK.APP is a privacy friendly video conference service (www.wurk.app).</small>
+                            </p>
+                            <p></p>
+                        </div>
+                    </div>
+                    <a id="emailInvite" href="#" target="_blank" class="btn btn-primary">Email invite text</a>
+                    <a href="#" onclick="copyInvite(1);" class="btn btn-primary">Copy to clipboard</a>
+                    <hr />
+                    <h4>Creating rooms</h4>
+                    <p>Create any number of rooms. Join them using the 'join' button. Move others to the rooms. When
+                        they
+                        hang up they are returned to the main room.</p>
+                    <p>To end the meeting for everyone, press 'End Meeting' button.</p>
+                    <p><small><a href="https://www.wurk.app" target="_blank">About this service</a></small></p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Got it!</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div id="entryModal" class="modal" tabindex="-1" role="dialog">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <img src="https://www.wurk.app/favicon.ico" class="img mr-2" />
+                    <h5 class="modal-title">Prepare your meeting</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <h4>Please enter a title for your meeting</h4>
+                    <input type="text" class="form-control input-group-prepend" id="subjectModal"
+                        placeholder="Meeting title"
+                        title="Enter a title for the meeting to display on the attendee's screen.">
+                    <hr />
+                    <h4>Please enter your name</h4>
+                    <p>This is the name that will be displayed to other attendees.</p>
+                    <input type="text" class="form-control" id="displayNameModal" placeholder="Organizer"
+                        title="Enter your name so attendees know who the host is">
+                    <hr>
+                    <h4>Letting others join</h4>
+                    <p>To invite others to join, use the buttons below. <br> You can either send them a link,
+                        or use a pre-made email.</p>
+                    <a href="#" onclick="copyInvite(0);" class="btn btn-primary">Copy invite link</a>
+                    <a id="topic_email_invite" href="#" class="btn btn-primary">Email invite text</a>
+                    <p class="mt-2"><small>iOS and Android users can open the link too but can only use the Main Room.</small></p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" onclick="entryInput()" class="btn btn-secondary"
+                        data-dismiss="modal">Start!</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="d-flex justify-content-start align-items-center">
+        <div id="messageSent" class="toast" style="position: absolute; top: 15%; left: 3%;" role="alert" aria-live="assertive"
+            aria-atomic="true" data-delay="5000" data-animation="true">
+            <div class="toast-header">
+                <strong class="mr-auto">All the others have been notified of your message</strong>
+                <button type="button" class="ml-2 mb-1 close" data-dismiss="toast" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="toast-body">
+                <span id="messageBody"></span>
+            </div>
+        </div>
+    </div>
+    <div id="meetingControlsModal" class="modal" tabindex="-1" role="dialog">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <img src="https://www.wurk.app/favicon.ico" class="img mr-2" />
+                    <h5 class="modal-title">Meeting controls</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <h5>Timebox for all meeting participants</h5>
+                    <form class="form-row" onsubmit="applyTimebox(); return false;">
+
+                    <input type="number" class="form-control col-8" id="timebox"
+                        placeholder="15"
+                        title="Enter a title for the meeting to display on the attendee's screen.">
+                        <button class="btn-secondary btn-sm col ml-2 " onclick="applyTimebox();"
+                            title="send a message to participants in all meetings">
+                            Set timebox<i class="fas fa-stopwatch ml-2 mt-1"></i></button>
+                    </form>
+                        <p class="text-black-50">The participants will see a countdown. When it hits 0, they will automatically leave the room they are in and join the Main room.
+                        </p>
+                        <hr />
+                    <h5>Broadcast a message to all attendees</h5>
+                    <form class="form-row" onsubmit="broadCastMessage(); return false;">
+                        <textarea type="text" class="form-control col-8" id="broadcast" placeholder="Lets take a break, back in..."></textarea>
+                        <button class="btn-secondary btn ml-2 col"
+                            title="send a message to participants in all meetings">
+                            Broadcast <i class="fas fa-bullhorn ml-2 mt-1"></i></button>
+                    </form>
+                    <p class="text-black-50">The message will be sent to all rooms. You can include links to websites.</p>
+
+                    <hr>
+                    <h5>End the meeting</h5>
+                    <p class="text-black-50">End the meeting for everyone and send them to the feedback page.</p>
+                                <button class="btn-danger btn mr-3 " onclick="endMeeting();"
+                                    title="sends all participants to the post-meeting screen">
+                                    End meeting</button>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" onclick="entryInput()" class="btn btn-secondary"
+                        data-dismiss="modal">Start!</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div id="incompatibleBrowser" class="modal" tabindex="-1" role="dialog">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+    
+                    <img src="https://www.wurk.app/favicon.ico" class="img mr-2" />
+                    <h5 class="modal-title">Incompatible browser detected</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+    
+                </div>
+                <div class="modal-body">
+                    <p>We want to give you the best video experience, but your browser does not fully support the open standards
+                        we need for that.</p>
+                    <p>Please use the latest Chrome browser: <a
+                            href="https://www.google.com/chrome/">https://www.google.com/chrome/</a> </p>
+                    <p><sub>(Edge and Firefox will also work)</sub></p>
+                </div>
+                <div class="modal-footer">
+                    <button onclick="entryModal();" class="btn btn-secondary" data-dismiss="modal">Ok</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="log" class="container pl-0"></div>
+</body>
+
+</html>
+
+<script src="js/jquery-3.4.1.slim.min.js"></script>
+<script src="js/popper.min.js"></script>
+<script src="js/bootstrap.min.js"></script>
+<script src="js/wurk-1.0.js"></script>
+<script src="js/icons.js"></script>
+
+<script>
+
+    const DEBUG = false;
+    let api;
+    let meetingStartTime = (new Date()).toISOString();
+    let displayName;
+    let subject;
+    let callParticipantId;
+
+    let moderatorPrefix = (Math.random().toString(36).substring(2, 16) + Math.random().toString(36).substring(2, 16)).toLowerCase() + '-';
+    let presetModeratorPrefix = (new URLSearchParams(window.location.search)).get('id');
+
+    let rooms;
+    let inviteLink;
+    let mainRoom = "Main-Room";
+    let conferenceDiv = "breakoutRoom";
+    let currentRoom;
+    let timeboxEnd = new Date();
+    let timeboxChecker;
+
+    init();
+
+    let participantId = window.sessionStorage.getItem(moderatorPrefix + "-participantId");
+    if (!participantId) {
+        participantId = uuidv4();
+        window.sessionStorage.setItem(moderatorPrefix + "-participantId", participantId);
+    }
+
+    function init() {
+        console.log('Initialising page');
+        if (presetModeratorPrefix && presetModeratorPrefix.length > 10) {
+            moderatorPrefix = presetModeratorPrefix;
+        }
+        else {
+            window.location.replace('moderator.html?id=' + moderatorPrefix);
+        }
+        if (DEBUG) {
+            moderatorPrefix = "debugThisSession"
+        }
+        try {
+            let startTime = window.sessionStorage.getItem(moderatorPrefix + "-startTime");
+            if (startTime === null) {
+                window.sessionStorage.setItem(moderatorPrefix + "-startTime", meetingStartTime);
+            }
+            else {
+                meetingStartTime = startTime;
+            }
+            let roomsText = window.sessionStorage.getItem(moderatorPrefix);
+            console.log(roomsText);
+            rooms = JSON.parse(roomsText);
+            if (rooms == undefined) {
+                rooms = {};
+            }
+            else {
+                removeAllParticipants();
+            }
+        }
+        catch (err) {
+            rooms = {};
+        }
+        inviteLink = 'https://' + window.location.hostname + '/ws/attendee.html?id=' + moderatorPrefix;
+        $('#shareLink').text(inviteLink);
+        $('#invisibleShareLink').text(inviteLink);
+
+        displayName = window.sessionStorage.getItem(moderatorPrefix + "-displayName");
+        $('#displayName').val(displayName);
+        subject = window.sessionStorage.getItem(moderatorPrefix + "-subject");
+        $('#subject').text(subject);
+
+        if (subject == null || subject == ""|| displayName == null || displayName=="") {
+            if (isCompatibleBrowser() == true) {
+                entryModal();
+            }
+        }
+        loadHelp();
+    }
+
+    function copyInvite(type) {
+        let range = document.createRange();
+        if (type == 0) { //0 is slechts de link, ander getal is hele verhaal
+            range.selectNode(document.getElementById('invisibleShareLink'));
+        }
+        else {
+            range.selectNode(document.getElementById('shareInvite'));
+        }
+        window.getSelection().removeAllRanges();
+        window.getSelection().addRange(range);
+        document.execCommand('copy');
+    }
+
+    function showMeetingControls(){
+        $('#meetingControlsModal').modal('show');
+    }
+
+    function loadHelp() {
+        $(".inviteLink").text(inviteLink);
+        let emailInvite = $("#emailInvite");
+        let bodyLines = $("#shareInvite").text().split("\n");
+        let body = bodyLines.join("%0D%0A");
+        console.log(body);
+        emailInvite.attr("href", "mailto:?subject=Invitation for a WURK.APP videocall&body=" + body);
+    }
+
+    function entryModal() {
+        $('#displayNameModal').val(displayName);
+        $('#subjectModal').val(subject);
+        let bodyLines = $("#shareInvite").text().split("\n");
+        let body = bodyLines.join("%0D%0A");
+        $('#topic_email_invite').attr("href", "mailto:?subject=Invitation for a WURK.APP videocall&body=" + body);
+        $('#entryModal').modal('show');
+    }
+
+    function broadCastMessage() {
+        let message = $('#broadcast').val();
+        message = JSON.stringify(linkify(message));
+        doSend(`PUB:"${moderatorPrefix}":{"cmd":"broadcast", "properties":{"message":${message}, "displayName": "${displayName}"}}`);
+        $('#messageSent').toast('show');
+        let messageBody = document.querySelector("#messageBody");
+        messageBody.innerHTML = message;
+    }
+
+    function applyTimebox() {
+        let timebox = $('#timebox').val();
+        timeboxEnd = (new Date()).getTime() + timebox * 60000;
+        doSend(`PUB:"${moderatorPrefix}":{"cmd":"timebox", "properties":{"timebox":${timebox}, "displayName": "${displayName}"}}`);
+        $('#timeboxRemainder').addClass("text-black-50");
+        $('#timeboxRemainder').removeClass("text-danger");
+        $('#timeboxRemainder').removeClass("font-weight-bold");
+        $('#messageSent').toast('show');
+        let messageBody = document.querySelector("#messageBody");
+        messageBody.innerHTML = "Timebox shown to everyone in the meeting, they will see a countdown at the top of their window";
+
+    }
+
+    function entryInput() {
+        if ((displayName != $('#displayNameModal').val())){
+            displayName = $('#displayNameModal').val();
+            shareName(displayName);
+        }
+        subject = $('#subjectModal').val();
+        shareSubject(subject);
+    }
+
+    function shareName(new_name) {
+        displayName = new_name ? new_name : $('#displayName').val();
+        $('#displayName').val(displayName);
+        window.sessionStorage.setItem(moderatorPrefix + "-displayName", displayName);
+        doSend(`PUB:"${moderatorPrefix}":{"cmd":"moderatorPong", "properties":{"displayName": "${displayName}"}}`);
+        if (api) api.executeCommand("displayName", displayName);
+    }
+
+    function shareSubject(new_subject) {
+        subject = new_subject ? new_subject : $('#subject').val();
+        if (subject == "") {
+            subject = "My Meeting";
+        }
+        $('#subject').text(subject);
+        window.sessionStorage.setItem(moderatorPrefix + "-subject", subject);
+        doSend(`PUB:"${moderatorPrefix}":{"cmd":"subject", "properties":{"subject": "${subject}"}}`);
+    }
+
+    function joinMainRoom(){
+        joinRoom(conferenceDiv, mainRoom, true, true);
+    }
+
+    // Websocket code
+
+    function onOpen(evt) {
+        writeToScreen("CONNECTED");
+        doSend(`SUB:"${moderatorPrefix}"`);
+        doSend(`PUB:"${moderatorPrefix}":{"cmd":"ping"}`);
+    }
+
+    function onMessage(evt) {
+        let message = evt.data;
+        let messageString = '{' + message.substring(4) + '}';
+        let event = JSON.parse(messageString);
+        let command = event[moderatorPrefix];
+        if (command.cmd == 'joinedRoom') {
+            participantJoined(command.properties);
+        }
+        if (command.cmd == 'leftRoom') {
+            participantLeft(command.properties);
+        }
+        if (command.cmd == 'displayNameChanged') {
+            displayNameChanged(command.properties);
+        }
+        if (command.cmd == 'pong') {
+            participantJoined(command.properties);
+        }
+        if (command.cmd == 'ping') {
+            doSend(`PUB:"${moderatorPrefix}":{"cmd":"moderatorPong", "properties": {"displayName": "${displayName}", "subject": "${subject}"}}`);
+        }
+        if (command.cmd == 'audioMuteStatusChanged') {
+            let participant = getParticipant(command.properties.id);
+            participant['audioMuted'] = command.properties.muted;
+        }
+        if (command.cmd == 'videoMuteStatusChanged') {
+            let participant = getParticipant(command.properties.id);
+            participant['videoMuted'] = command.properties.muted;
+        }
+        if (command.cmd == 'tileViewChanged') {
+            let participant = getParticipant(command.properties.id);
+            participant['tileView'] = command.properties.enabled;
+        }
+
+        writeToScreen('<span style="color: blue;">RESPONSE: ' + evt.data + '</span>');
+    }
+
+    // rooms and video code
+
+    let refresh = setInterval(function () { refreshScreen() }, 1000);
+
+    function refreshScreen() {
+        refreshOverallDuration();
+        checkTimebox();
+        refreshRoomList();
+    }
+
+    function checkTimebox() {
+        if (timeboxEnd > new Date()){
+            // timebox is active
+            let remainder = getRemainingTime();
+            $('#timeboxRemainder').text(remainder)
+            if (timeboxEnd - new Date() <= 0) {
+                if (currentRoom != mainRoom) {
+                    setTimeout(function () {
+                        endRoom(); joinMainRoom();
+                    }, 3000);
+                }
+                clearInterval(timeboxChecker);
+            } 
+            // let user know the last 10 seconds of the timebox
+            if (timeboxEnd - new Date() <= 10*1000){
+                $('#timeboxRemainder').removeClass("text-black-50");
+                $('#timeboxRemainder').addClass("text-danger");
+                $('#timeboxRemainder').addClass("font-weight-bold");
+            }
+        }
+    }
+
+    function refreshOverallDuration() {
+        refreshDuration('duration', meetingStartTime);
+    }
+
+    function refreshDuration(div, startTime) {
+        let durationSpan = document.querySelector('#' + div);
+        durationSpan.textContent = getTimePassed(new Date(startTime));
+    }
+
+    function getTimePassed(startTime) {
+        let duration = (new Date() - startTime);
+        var diffHrs = pad(Math.floor((duration % 86400000) / 3600000), 2); // hours
+        var diffMins = pad(Math.floor(((duration % 86400000) % 3600000) / 60000), 2);
+        var diffSecs = pad(Math.floor(((duration % 86400000) % 60000) / 1000), 2);
+        return `${diffHrs}:${diffMins}:${diffSecs}`
+    }
+
+    function addParticipantControls(participantDiv, participant, moderatorPrefix) {
+        let muteAudio = document.createElement('span');
+        muteAudio.setAttribute('class', 'ml-2 mr-2');
+        muteAudio.setAttribute('href', '#!');
+        muteAudio.setAttribute('title', 'Toggle Video');
+        muteAudio.addEventListener('click', () => {
+            doSend(`PUB:"${moderatorPrefix}":{"cmd":"toggleAudio", "properties": \
+                            {"id":"${participant.id}"}}`);
+        });
+        participantDiv.appendChild(muteAudio);
+        if (participant['audioMuted'] == true) muteAudio.innerHTML = '<i class="fas fa-microphone-slash"></i>'
+        else muteAudio.innerHTML = '<i class="fas fa-microphone"></i>';
+
+        //
+        let muteVideo = document.createElement('span');
+        muteVideo.setAttribute('class', 'ml-2 mr-2');
+        muteVideo.setAttribute('href', '#!');
+        muteVideo.setAttribute('title', 'Toggle Video');
+        muteVideo.addEventListener('click', () => {
+            doSend(`PUB:"${moderatorPrefix}":{"cmd":"toggleVideo", "properties": \
+                            {"id":"${participant.id}"}}`);
+        });
+        participantDiv.appendChild(muteVideo);
+        if (participant['videoMuted'] == true) muteVideo.innerHTML = '<i class="fas fa-video-slash"></i>'
+        else muteVideo.innerHTML = '<i class="fas fa-video"></i>';
+        //
+        let tileView = document.createElement('span');
+        tileView.setAttribute('class', 'ml-2 mr-2');
+        tileView.setAttribute('href', '#!');
+        tileView.setAttribute('title', 'Toggle tile view');
+        tileView.addEventListener('click', () => {
+            doSend(`PUB:"${moderatorPrefix}":{"cmd":"toggleTileView", "properties": \
+                            {"id":"${participant.id}"}}`);
+        });
+        participantDiv.appendChild(tileView);
+        if (participant['tileView'] == true) tileView.innerHTML = '<svg stroke="rgb(0, 123, 255)" height="14" width="14" viewBox="0 0 24 24"><path d="M2.667 0H8a2.667 2.667 0 012.667 2.667V8A2.667 2.667 0 018 10.667H2.667A2.667 2.667 0 010 8V2.667A2.667 2.667 0 012.667 0zM4 2.667c-.736 0-1.333.597-1.333 1.333v2.667C2.667 7.403 3.264 8 4 8h2.667C7.403 8 8 7.403 8 6.667V4c0-.736-.597-1.333-1.333-1.333H4zM2.667 13.333H8A2.667 2.667 0 0110.667 16v5.333A2.667 2.667 0 018 24H2.667A2.667 2.667 0 010 21.333V16a2.667 2.667 0 012.667-2.667zM4 16c-.736 0-1.333.597-1.333 1.333V20c0 .736.597 1.333 1.333 1.333h2.667C7.403 21.333 8 20.736 8 20v-2.667C8 16.597 7.403 16 6.667 16H4zM16 0h5.333A2.667 2.667 0 0124 2.667V8a2.667 2.667 0 01-2.667 2.667H16A2.667 2.667 0 0113.333 8V2.667A2.667 2.667 0 0116 0zm1.333 2.667C16.597 2.667 16 3.264 16 4v2.667C16 7.403 16.597 8 17.333 8H20c.736 0 1.333-.597 1.333-1.333V4c0-.736-.597-1.333-1.333-1.333h-2.667zM16 13.333h5.333A2.667 2.667 0 0124 16v5.333A2.667 2.667 0 0121.333 24H16a2.667 2.667 0 01-2.667-2.667V16A2.667 2.667 0 0116 13.333zM17.333 16c-.736 0-1.333.597-1.333 1.333V20c0 .736.597 1.333 1.333 1.333H20c.736 0 1.333-.597 1.333-1.333v-2.667c0-.736-.597-1.333-1.333-1.333h-2.667z"></path></svg>';
+        else tileView.innerHTML = '<i class="fas fa-desktop"></i>';
+
+    }
+    function addMoveToRoomControls(participantDiv, participant, participantRoom, rooms, moderatorPrefix) {
+        let numberOfRooms = Object.keys(rooms).length;
+        if (numberOfRooms > 1) participantDiv.appendChild(document.createTextNode('| Move to '));
+        Object.keys(rooms).forEach((gotoKey, gotoIndex) => {
+            if (gotoKey != participantRoom) {
+                let gotoLink = document.createElement('a');
+                gotoLink.setAttribute('class', 'text-primary ml-1 mr-1');
+                gotoLink.setAttribute('href', '#!');
+                gotoLink.appendChild(document.createTextNode(gotoKey));
+                gotoLink.addEventListener('click', () => {
+                    rooms[gotoKey].visible = true; // ideetje misschien?
+                    doSend(`PUB:"${moderatorPrefix}":{"cmd":"joinRoom", "properties": \
+                            {"room":"${gotoKey}", "id":"${participant.id}"}}`);
+                });
+                participantDiv.appendChild(gotoLink);
+                if (numberOfRooms > 2 && gotoIndex < (numberOfRooms - 1)) participantDiv.appendChild(document.createTextNode('|'));
+            }
+        });
+    }
+
+    function addMeetingControls(room, div){
+        let buttonsDiv = document.createElement('div');
+        buttonsDiv.setAttribute('class','container-fluid row pb-2 pt-2 bg-light border-bottom');
+        let joinDiv = document.createElement('div');
+        joinDiv.setAttribute('class', 'container col');
+        let removeDiv = document.createElement('div');
+        removeDiv.setAttribute('class', 'container col');
+        let joinButton = document.createElement('button');
+        joinButton.appendChild(document.createTextNode('Join'));
+        joinButton.setAttribute('class', 'btn btn-primary btn-block ');
+        joinButton.setAttribute('href', '#!');
+        let divId = conferenceDiv;
+        joinButton.addEventListener('click', () => {
+            joinRoom(divId, room, true, true);
+        });
+        joinDiv.appendChild(joinButton);
+        buttonsDiv.appendChild(joinDiv);
+        //
+        let emptyDiv = document.createElement('div');
+        emptyDiv.setAttribute('class', 'container col');
+        buttonsDiv.appendChild(emptyDiv);
+        if (room != mainRoom) {
+            let emptyRoomDiv = document.createElement('button');
+            emptyRoomDiv.appendChild(document.createTextNode('Empty'));
+            emptyRoomDiv.setAttribute('class', 'btn btn-danger btn-block');
+            emptyRoomDiv.setAttribute('href', '#!');
+            emptyRoomDiv.addEventListener('click', () => {
+                emptyRoom(room);
+            });
+            emptyDiv.appendChild(emptyRoomDiv);
+        }        
+        //
+        buttonsDiv.appendChild(removeDiv);
+        if (room != mainRoom) {
+            let endRoomDiv = document.createElement('button');
+            endRoomDiv.appendChild(document.createTextNode('Remove'));
+            endRoomDiv.setAttribute('class', 'btn btn-danger btn-block');
+            endRoomDiv.setAttribute('href', '#!');
+            endRoomDiv.addEventListener('click', () => {
+                endRoom(room);
+            });
+            removeDiv.appendChild(endRoomDiv);
+        }
+        div.appendChild(buttonsDiv);
+    }
+
+    function toggleRoomDetails(room){
+        if (rooms[room].visible ==true){
+            rooms[room].visible = false;
+        }
+        else{
+            rooms[room].visible = true;
+        }
+        refreshRoomList();
+    }
+
+    function refreshRoomList() {
+        let roomsDiv = document.querySelector('#rooms');
+        while (roomsDiv.firstChild) {
+            roomsDiv.firstChild.remove();
+        }
+        Object.keys(rooms).forEach((key, index) => {
+            let roomDiv = document.createElement('div');
+            roomDiv.setAttribute('class', 'container-fluid row pl-0 pr-0 mb-2 pb-2 align-items-start');
+            let roomHeaderDiv = document.createElement('div');
+            roomHeaderDiv.setAttribute('class', 'container-fluid row pb-2 align-items-start border-bottom');
+            roomHeaderDiv.setAttribute('style', 'cursor:pointer');
+            let roomHeaderRowDiv = document.createElement('div');
+            roomHeaderRowDiv.setAttribute('class', 'container-fluid row align-items-start');
+            roomHeaderDiv.appendChild(roomHeaderRowDiv);
+            roomHeaderDiv.addEventListener('click', () => {
+                toggleRoomDetails(key);
+            });
+            roomDiv.appendChild(roomHeaderDiv);
+            let roomDescriptionDiv = document.createElement('div');
+            roomDescriptionDiv.appendChild(document.createTextNode(key + ' '));
+            roomDescriptionDiv.setAttribute('class', 'container-fluid col text-black-50 align-items-start ');
+            roomDescriptionDiv.appendChild(document.createTextNode('(' + getTimePassed(new Date(rooms[key].meetingStartTime)) + ')'));
+            roomHeaderRowDiv.appendChild(roomDescriptionDiv)
+            let counterDiv = document.createElement('div');
+            counterDiv.setAttribute('class', '');
+            counterDiv.innerHTML = '<span class=" text-black-50 ">'+rooms[key].participants.length + ' <i class="fas fa-user-friends"></i></span>';
+            roomHeaderRowDiv.appendChild(counterDiv);
+            let expansionDiv = document.createElement('div');
+            expansionDiv.innerHTML = "<span class='text-black-50 ml-3'><i class='fas fa-chevron-down'></i></span>";
+            roomHeaderDiv.appendChild(expansionDiv);
+            roomsDiv.appendChild(roomDiv);
+            if (rooms[key].visible){
+                let particantListDiv = document.createElement('div');
+                expansionDiv.innerHTML = "<span class='text-black-50 ml-3'><i class='fas fa-chevron-up'></i></span>";
+                particantListDiv.setAttribute('class', 'container row pt-2 pb-2 bg-light');
+                roomDiv.appendChild(particantListDiv);
+                rooms[key].participants.forEach((participant) => {
+                    let participantDiv = document.createElement('div');
+                    participantDiv.setAttribute('id', participant.id);
+                    participantDiv.setAttribute('class', 'container row ml-1 align-items-center')
+                    participantDiv.innerHTML = '<span class="text-black-50 mr-2">' + participant.displayName + ' </span>';
+                    addParticipantControls(participantDiv, participant, moderatorPrefix);
+                    addMoveToRoomControls(participantDiv, participant, key, rooms, moderatorPrefix)
+                    particantListDiv.appendChild(participantDiv);
+                });
+                addMeetingControls(key, roomDiv);
+            }
+        });
+    }
+
+    function participantJoined(properties) {
+        console.log(`NEW PARTICIPANT ${properties.id}`);
+        if (rooms[properties.room] == undefined) {
+            rooms[properties.room] = { 'participants': [] };
+        }
+        let participant;
+        rooms[properties.room]['participants'].forEach(element => {
+            if (element.id == properties.id) {
+                participant = element
+            }
+        });
+        //console.log(participant);
+        if (participant == undefined) {
+            rooms[properties.room]['participants'].push(properties);
+        }
+        else {
+            participant.displayName = properties.displayName;
+            participant.audioMuted = properties.audioMuted;
+            participant.videoMuted = properties.videoMuted;
+            participant.tileView = properties.tileView;
+            if (participant.id == participantId) {
+                participant.moderator = true;
+            }
+        }
+        refreshRoomList();
+    }
+
+    function participantLeft(properties) {
+        console.log(`PARTICIPANT ${properties.id} LEFT ROOM ${properties.room}`);
+        if (rooms[properties.room]) {
+            let participants = rooms[properties.room]['participants'];
+            for (let i = 0; i < participants.length; i++) {
+                if (participants[i].id == properties.id) {
+                    participants.splice(i, 1);
+                    break;
+                }
+            }
+            refreshRoomList();
+        }
+    }
+
+    function displayNameChanged(properties) {
+        console.log(`DISPLAY NAME CHANGED  ${properties.id} in ${properties.room}`);
+        let participants = rooms[properties.room]['participants'];
+        for (let i = 0; i < participants.length; i++) {
+            if (participants[i].id == properties.id) {
+                participants[i].displayName = properties.displayName;
+                console.log(`NAME CHANGED TO ${properties.displayName}`);
+                break;
+            }
+        }
+        refreshRoomList();
+    }
+
+    function removeAllParticipants() {
+        Object.keys(rooms).forEach((key, index) => {
+            rooms[key]['participants'] = [];
+        });
+    }
+
+    function getParticipant(id) {
+        let returnValue;
+        Object.keys(rooms).forEach((key, index) => {
+            let participants = rooms[key]['participants'];
+            for (let i = 0; i < participants.length; i++) {
+                if (participants[i].id == id) {
+                    returnValue = participants[i];
+                    break;
+                }
+            }
+        });
+        return returnValue;
+    }
+
+    function createNumberedRoom() {
+        let i = (Object.keys(rooms).length);
+        let roomName = "Room" + i;
+        while (rooms[roomName]) {
+            i = i + 1;
+            roomName = "Room" + i;
+        }
+        createRoom(roomName);
+    }
+
+    function createRoom(roomName) {
+        rooms[roomName] = { participants: [], meetingStartTime: (new Date()).toISOString(), visible:false };
+        saveRooms(moderatorPrefix, rooms);
+        refreshRoomList();
+    }
+
+    function saveRooms(key, rooms) {
+        window.sessionStorage.setItem(key, JSON.stringify(rooms));
+    }
+
+    function leaveRoom(roomName) {
+        let divId = conferenceDiv
+        let div = document.querySelector('#' + divId);
+        while (div.firstChild) {
+            div.firstChild.remove();
+        }
+        $('#noRoomJoined').show();
+        div.parentElement.setAttribute('class', 'container-fluid col-9 jumbotron');
+
+    }
+
+    function endRoom(roomName) {
+        doSend(`PUB:"${moderatorPrefix}":{"cmd":"endRoom", "properties": {"room":"${roomName}"}}`);
+        if (roomName == currentRoom) {
+            api.executeCommand("hangup");
+        }
+        delete rooms[roomName];
+        saveRooms(moderatorPrefix, rooms);
+        refreshRoomList();
+    }
+
+    function emptyRoom(roomName) {
+        doSend(`PUB:"${moderatorPrefix}":{"cmd":"endRoom", "properties": {"room":"${roomName}"}}`);
+    }
+
+    function endMeeting() {
+        doSend(`PUB:"${moderatorPrefix}":{"cmd":"endMeeting"}`);
+        if ((api != undefined)) {
+            api.executeCommand('hangup');
+            //api.dispose();
+        }
+        clearTimeout(refresh);
+        window.location.replace('https://www.wurk.app/thanks-beta/');
+    }
+
+    function joinRoom(divId, roomName, audio, video) {
+        if (api){
+            console.log('HANGING UP');
+            api.executeCommand('hangup');
+            participantLeft({id: participantId, room:currentRoom})
+        }
+        console.log('Creating room: ' + roomName);
+        let top = document.querySelector('#' + divId);
+
+        while (top.firstChild) {
+            top.firstChild.remove();
+        }
+        top.setAttribute('style', 'height:100%; width:100%;')
+        $('#noRoomJoined').hide();
+        top.parentNode.setAttribute('class', 'container-fluid col-9')
+
+        const options = {
+            roomName: moderatorPrefix + '-' + roomName,
+            parentNode: document.querySelector('#' + divId),
+            configOverwrite: {
+                channelLastN: 25,
+                liveStreamingEnabled: true
+            },
+            interfaceConfigOverwrite: {
+                DEFAULT_REMOTE_DISPLAY_NAME: 'Unknown participant',
+                SHOW_JITSI_WATERMARK: false,
+                TOOLBAR_BUTTONS: [
+                    'microphone', 'camera', 'desktop', 'fullscreen',
+                    'fodeviceselection', 'hangup', 'profile', 'chat',
+                    'sharedvideo', 'settings', 'raisehand',
+                    'videoquality', 'filmstrip', 'feedback', 'stats', 'shortcuts',
+                    'tileview', 'videobackgroundblur', 'download', 'help', 'mute-everyone', 'livestreaming'
+                ]
+            }
+        };
+        api = new JitsiMeetExternalAPI(jitsiDomain, options);
+
+        api.executeCommand('subject', roomName);
+        api.executeCommand("displayName", displayName);
+        api.on("videoConferenceLeft", (event) => {
+            event.room = roomName;
+            event.id = participantId;
+            participantLeft(event);
+            leaveRoom(roomName);
+        });
+        api.on("videoConferenceJoined", (event) => {
+            displayName = event.displayName;
+            callParticipantId = event.id;
+            event.id = participantId;
+            event.room = roomName;
+            participantJoined(event);
+        });
+        api.on("displayNameChange", (event)=>{
+            event.room = roomName;
+            if (event.id == callParticipantId){
+                event.displayName = event.formattedDisplayName;
+            }else{
+                event.displayName = event.displayname;
+            }
+            displayNameChanged(event);
+        });
+        
+        if (audio == false) { api.executeCommand('toggleAudio'); }
+        if (video == false) { api.executeCommand('toggleVideo'); }
+        currentRoom = roomName;
+    }
+
+
+    if (!rooms[mainRoom]) {
+        createRoom(mainRoom);
+    }
+
+    window.onbeforeunload = function () {
+//        endMeeting();
+        if (api) api.dispose();
+    };
+
+</script>

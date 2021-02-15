@@ -1,0 +1,13 @@
+@keyframes blinker {  
+  from { visibility: visible }
+  to { visibility: hidden }
+
+  /* Alternatively you can do this:  
+  0% { visibility: visible; }
+  50% { visibility: hidden; }
+  100% { visibility: visible; }
+  if you don't want to use `alternate` */
+}
+.blink_me {
+  animation: blinker steps(1) 500ms infinite alternate;
+}

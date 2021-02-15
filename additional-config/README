@@ -1,0 +1,53 @@
+Copyright 2020 Itude Mobile BV
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+***************************************************************************************************
+
+
+
+Jitsi-meet with Breakout rooms
+v 1.0
+***************************************************************************************************
+
+*** To start, stop or restart the services, use:
+. /additional-config/scripts/start-all.sh
+. /additional-config/scripts/stop-all.sh
+. /additional-config/scripts/restart-all.sh
+
+*** Breakout rooms website
+The web interface is available at https://[host]/ws/moderator.html
+The web resources can be modified in the folder /docker-websocket/public . 
+The folder /docker-websocket/public is shared with a docker container running a node.js websocket
+and serving the web resources.
+Changes to the web resources are immediately reflected after browser reload
+
+*** Jitsi meet installation
+Nginx and Jitsi interface files can be modified in /additional-config/
+Running the restart-all.sh script or start-all.sh script copies the ngingx and jitsi files to 
+the jitsi-web container and (re)starts the services.
+The /config folder is shared with the running jitsi docker instances. Copying a file to this folder 
+shares it with the docker instances, but it may need a restart of the container to pick up the file.
+/config/web is shared with the jitsi web server
+/config/jvb with the jitsi video bridge
+etc.
+
+*** SSL certificate renewal
+The SSL certificate is created and renewed by certbot. Certbot has a rate limiter of 5 renewals / week.
+A cron job runs every week, renewing the certificate. It can be manually run with the script:
+. /additional-config/scripts/renew-ssl.sh  
+This can be customized in the crontab with crontab -e
+
+*** Restart services
+The jitsi video conferencing software can get slower after several week of uptime. 
+To remedy this, the script . /additional-config/scripts/restart-all.sh  runs every day at 00:00 UTC. This can be customized
+in the cron tab with crontab -e
